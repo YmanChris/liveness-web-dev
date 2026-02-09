@@ -1,11 +1,18 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import basicSsl from '@vitejs/plugin-basic-ssl';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import mkcert from 'vite-plugin-mkcert'
 
-export default defineConfig({
-  plugins: [react(), basicSsl()],
-  server: {
-    host: true,
-    https: true,
-  },
-});
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production'
+  return {
+    // ✅ 关键：让产物引用相对路径 ./assets/...
+    base: isProd ? './' : '/',
+    server: {
+      host: true,
+      https: !isProd,
+      port: 5173
+    },
+    plugins: [react(), ...(isProd ? [] : [mkcert()])]
+  }
+})
+
